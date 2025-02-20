@@ -17,6 +17,9 @@ jobs:
   readme-updater:
     runs-on: ubuntu-latest
 
+    outputs:
+      changes_detected: ${{ steps.check_changes.outputs.changes_detected }}
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,8 +35,15 @@ jobs:
         run: python scripts/updater.py
 
       - name: Check for changes
+        id: check_changes
         run: |
-          git diff --quiet || echo "changes_detected=true" >> $GITHUB_ENV
+          if git diff --quiet; then
+            echo "changes_detected=false" >> $GITHUB_ENV
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          else
+            echo "changes_detected=true" >> $GITHUB_ENV
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+          fi
 
       - name: Commit and push changes
         if: env.changes_detected == 'true'
@@ -48,7 +58,7 @@ jobs:
 
   create-release:
     needs: readme-updater
-    if: env.changes_detected == 'true'
+    if: needs.readme-updater.outputs.changes_detected == 'true'
     runs-on: ubuntu-latest
 
     steps:
