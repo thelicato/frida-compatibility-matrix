@@ -18,4 +18,6 @@ The repos contains Python scripts (in the `scripts` folder) that fetch and deter
 * `cli.py`: A simple script that uses functions from `parser.py` to print the compatibility matrix table to stdout (mainly for testing purposes).
 * `updater.py`: The script invoked by the GitHub Workflow to automatically update the README with the latest compatibility table.
 
+## License
 
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
