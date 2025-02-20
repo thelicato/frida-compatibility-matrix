@@ -10,6 +10,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   readme-updater:
     runs-on: ubuntu-latest
@@ -40,5 +43,46 @@ jobs:
           git add README.md
           git commit -m "cicd: automatic compatibility matrix update ($(date -u +'%Y-%m-%d'))"
           git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+  create-release:
+    needs: readme-updater
+    if: env.changes_detected == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run JSON generation script
+        run: python scripts/output.py
+
+      - name: Get current date
+        run: echo "RELEASE_TAG=v$(date -u +'%Y.%m.%d')" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          release_name: "Release ${{ env.RELEASE_TAG }}"
+          body: "Automated release for compatibility matrix update."
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+      - name: Upload JSON file to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          files: frida-compatibility-matrix.json
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
