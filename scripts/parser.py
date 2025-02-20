@@ -81,3 +81,15 @@ def get_all_dependencies(tags):
                 break
 
     return compatibility_matrix
+
+def get_structured_data(compatibility_matrix):
+    """Return a structured dict from the compatibility matrix"""
+
+    output = {}
+    for frida_tools_version in compatibility_matrix:
+        frida_version_str = compatibility_matrix[frida_tools_version]
+        gte = frida_version_str.split(",")[0].split(">= ")[1].strip()
+        lt = frida_version_str.split("< ")[1].strip()
+        output[frida_tools_version] = {"gte": gte, "lt": lt}
+    
+    return output
