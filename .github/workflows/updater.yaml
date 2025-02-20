@@ -1,6 +1,6 @@
-# README updater workflow
+# Compatibility Matrix Updater Workflow
 
-name: README Updater
+name: Compatibility Matrix Updater
 
 on:
   # Run every night at midnight
