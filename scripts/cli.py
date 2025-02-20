@@ -20,6 +20,9 @@ def print_as_table(compatibility_matrix):
         print(f"| {frida_tool_version}{spaces_after_1} | {frida_version}{spaces_after_2} |")
 
 if __name__ == "__main__":
+    print("[+] Getting all tags...")
     tags = get_all_tags()
+    print(f"[+] Tags correctly retrieved, there are {len(tags)} tags available")
+    print("[+] Getting all dependency versions to build compatibility matrix")
     compatibility_matrix = get_all_dependencies(tags)
     print_as_table(compatibility_matrix)
