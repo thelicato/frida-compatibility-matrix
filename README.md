@@ -1,5 +1,10 @@
 # Frida Compatibility Matrix
 
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/thelicato/frida-compatibility-matrix/updater.yaml?branch=main)
+![GitHub last commit](https://img.shields.io/github/last-commit/thelicato/frida-compatibility-matrix)
+![License](https://img.shields.io/github/license/thelicato/frida-compatibility-matrix)
+
+
 The **Frida Compatibility Matrix** provides an easy-to-read table that displays the compatible versions of the [`frida`](https://pypi.org/project/frida/) package for each version of the [`frida-tools`](https://pypi.org/project/frida-tools/) package. This is particularly useful for developers and security researchers working with Frida who need to ensure compatibility between the core Frida library and its tools.
 
 ## Why?
