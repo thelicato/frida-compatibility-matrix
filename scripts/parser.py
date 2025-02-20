@@ -15,10 +15,8 @@ FRIDA_TOOLS_REPO = "frida/frida-tools"
 
 def get_github_headers():
     """Returns GitHub authentication headers if a token is available."""
-    github_token = os.getenv('LOCAL_GITHUB_TOKEN')
-    headers = {
-        "User-Agent": "Python-http.client"
-    }
+    github_token = os.getenv('GITHUB_TOKEN')
+    headers = {}
     if github_token:
         headers["Authorization"] = f"token {github_token}"
     return headers
