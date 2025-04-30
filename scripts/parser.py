@@ -20,7 +20,7 @@ def get_github_headers():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
     }
     if github_token:
-        headers["Authorization"] = f"token {github_token}"
+        headers["Authorization"] = f"Bearer {github_token}"
     return headers
 
 def make_request(host, url, headers):
