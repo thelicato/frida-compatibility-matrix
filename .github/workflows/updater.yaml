@@ -31,7 +31,7 @@ jobs:
 
       - name: Run updater script
         env: 
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/updater.py
 
       - name: Check for changes
