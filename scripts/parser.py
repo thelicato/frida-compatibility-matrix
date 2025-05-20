@@ -15,12 +15,15 @@ FRIDA_TOOLS_REPO = "frida/frida-tools"
 
 def get_github_headers():
     """Returns GitHub authentication headers if a token is available."""
-    github_token = os.getenv('GITHUB_TOKEN')
+    github_token = os.getenv('GH_TOKEN')
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
     }
     if github_token:
+        print("[+] Using GH_TOKEN for authenticated requests")
         headers["Authorization"] = f"Bearer {github_token}"
+    else:
+        print("[-] GH_TOKEN is not set, making unauthenticated requests")
     return headers
 
 def make_request(host, url, headers):
