@@ -17,6 +17,7 @@ Additionally, the versioning of the `frida-tools` package follows a different sc
 
 | `frida-tools` | `frida`              |
 | ------------- | -------------------- |
+| 14.1.2        | >= 17.1.0, < 18.0.0  |
 | 14.1.1        | >= 17.1.0, < 18.0.0  |
 | 14.1.0        | >= 17.1.0, < 18.0.0  |
 | 14.0.2        | >= 17.0.1, < 18.0.0  |
