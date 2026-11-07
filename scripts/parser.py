@@ -1,6 +1,8 @@
 import os
 import json
 import http.client
+import re
+import tomllib
 
 GITHUB_API = {
     'base': "api.github.com",
@@ -12,6 +14,13 @@ GITHUB_RAW = {
 }
 
 FRIDA_TOOLS_REPO = "frida/frida-tools"
+
+class GitHubRequestError(Exception):
+    """An unsuccessful GitHub response, including its HTTP status."""
+
+    def __init__(self, status, data, url):
+        self.status = status
+        super().__init__(f"[-] ERROR: status code {status} - error {data.decode()} - url {url}")
 
 def get_github_headers():
     """Returns GitHub authentication headers if a token is available."""
@@ -35,7 +44,7 @@ def make_request(host, url, headers):
     conn.close()
 
     if response.status != 200:
-        raise Exception(f"[-] ERROR: status code {response.status} - error {data.decode()} - url {url}")
+        raise GitHubRequestError(response.status, data, url)
 
     return data
 
@@ -63,7 +72,7 @@ def get_all_tags():
     return tags
 
 def get_all_dependencies(tags):
-    """Retrieves setup.py content for each tag and extracts frida version dependencies."""
+    """Extracts frida dependencies from setup.py or modern pyproject.toml metadata."""
     compatibility_matrix = {}
 
     for tag in tags:
@@ -71,17 +80,26 @@ def get_all_dependencies(tags):
         headers = get_github_headers()
 
         try:
-            data = make_request(GITHUB_RAW['base'], url, headers)
-        except Exception as e:
-            raise Exception(f"[-] ERROR: raw content read failed for tag {tag}. {e}")
+            try:
+                data = make_request(GITHUB_RAW['base'], url, headers)
+            except GitHubRequestError as e:
+                if e.status != 404:
+                    raise
+                url = f"{GITHUB_RAW['tags']}/{tag}/pyproject.toml"
+                data = make_request(GITHUB_RAW['base'], url, headers)
+                dependencies = tomllib.loads(data.decode()).get("project", {}).get("dependencies", [])
+            else:
+                dependencies = re.findall(r'''^\s*["'](frida\s*>=.*?)["'],?\s*$''', data.decode(), re.MULTILINE)
 
-        setup_content = data.decode()
-        for line in setup_content.splitlines():
-            stripped_line = line.strip()
-            if stripped_line.startswith('"frida >='):
-                compatible_versions = stripped_line.replace('"frida ', '').replace('",', '')
-                compatibility_matrix[tag] = compatible_versions
-                break
+            for dependency in dependencies:
+                match = re.fullmatch(r"frida\s*>=\s*([^,\s]+)\s*,\s*<\s*([^,\s]+)", dependency)
+                if match:
+                    compatibility_matrix[tag] = f">= {match[1]}, < {match[2]}"
+                    break
+            else:
+                raise ValueError(f"frida version dependency not found in {url}")
+        except Exception as e:
+            raise Exception(f"[-] ERROR: dependency metadata read failed for tag {tag}. {e}") from e
 
     return compatibility_matrix
 

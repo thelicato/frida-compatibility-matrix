@@ -29,6 +29,9 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Test dependency parser
+        run: python -m unittest discover -s tests -v
+
       - name: Run updater script
         env: 
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
